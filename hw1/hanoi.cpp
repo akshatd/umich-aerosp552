@@ -10,11 +10,19 @@ void hanoi(int n);
 void hanoi_rec(int n, std::string from, std::string temp, std::string to);
 
 int main(void) {
+	// tests: should return in (2^n)-1 moves
+	hanoi(0); // returns immediately
+	hanoi(1); // returns in 1 move
+	hanoi(2); // returns in 3 moves
+	hanoi(3); // returns in 7 moves
+
+	std::cout << '\n';
 	int num_disks = get_value_from_cin("number of disks", 0, __INT_MAX__);
 	hanoi(num_disks);
 	return 0;
 }
 
+// tested with inputs out of range and garbage inputs like strings
 int get_value_from_cin(std::string value_name, int min, int max) {
 	bool input_valid = false;
 	int  input;
@@ -37,7 +45,10 @@ int get_value_from_cin(std::string value_name, int min, int max) {
 	return input;
 }
 
-void hanoi(int n) { hanoi_rec(n, kFrom, kTemp, kTo); }
+void hanoi(int n) {
+	std::cout << "\nMoving " << n << " disks\n";
+	hanoi_rec(n, kFrom, kTemp, kTo);
+}
 
 void hanoi_rec(int n, std::string from, std::string temp, std::string to) {
 	if (n == 0) return;

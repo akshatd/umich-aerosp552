@@ -19,5 +19,5 @@ set(INCLUDE_DIR include)
 set(TEST_DIR test)
 
 # executables for hw1
-add_executable(navigation hw1/navigation.cpp)
-add_executable(hanoi hw1/hanoi.cpp)
+add_executable(navigation.o hw1/navigation.cpp)
+add_executable(hanoi.o hw1/hanoi.cpp)
