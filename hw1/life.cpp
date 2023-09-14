@@ -10,7 +10,7 @@
 constexpr int kMaxRows = 1000;
 constexpr int kMaxCols = 1000;
 
-const std::string kInitialPattern("life_beacon.dat");
+const std::string kInitialPattern("life.dat");
 // const std::string kInitialPatternFiles[] = {
 // 	"life.dat", "life1.dat", "life_block.dat", "life_beehive.dat", "life_beacon.dat",
 // };
@@ -99,7 +99,7 @@ char **readFile(std::string pattern_filename, bool &success, int &rows, int &col
 		// std::cout << line << '\n';
 		if (cols < 0) {
 			cols = line.size();
-		} else if (cols != line.size()) {
+		} else if (cols != static_cast<int>(line.size())) {
 			std::cout << "**Error: Lines do not have the same number of characters\n";
 			success = false;
 			return nullptr;
