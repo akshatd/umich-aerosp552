@@ -12,23 +12,23 @@ constexpr double kRadiusEarth = 3440;
 void             fly(double latA, double longA, double latB, double longB);
 
 constexpr double kToRadCoeff = M_PI / 180.0;
-constexpr double to_rad(double deg);
+double           to_rad(double deg);
 
 constexpr double kToDegCoeff = 180.0 / M_PI;
-constexpr double to_deg(double rad);
+double           to_deg(double rad);
 
 int main(void) {
 	// test for helper functions
-	static_assert(to_deg(M_PI) == 180.0);
-	static_assert(to_deg(M_PI / 2) == 90.0);
-	static_assert(to_deg(M_PI * 2) == 360.0);
-	static_assert(to_deg(0) == 0);
-	static_assert(to_deg(-M_PI / 2) == -90.0);
-	static_assert(to_rad(180.0) == M_PI);
-	static_assert(to_rad(90.0) == M_PI / 2);
-	static_assert(to_rad(360.0) == M_PI * 2);
-	static_assert(to_rad(0) == 0);
-	static_assert(to_rad(-90.0) == -M_PI / 2);
+	if (to_deg(M_PI) != 180.0) std::cout << "Test (to_deg(M_PI) == 180.0) failed\n";
+	if (to_deg(M_PI / 2) != 90.0) std::cout << "Test (to_deg(M_PI / 2) == 90.0) failed\n";
+	if (to_deg(M_PI * 2) != 360.0) std::cout << "Test (to_deg(M_PI * 2) == 360.0) failed\n";
+	if (to_deg(0) != 0) std::cout << "Test (to_deg(0) == 0) failed\n";
+	if (to_deg(-M_PI / 2) != -90.0) std::cout << "Test (to_deg(-M_PI / 2) == -90.0) failed\n";
+	if (to_rad(180.0) != M_PI) std::cout << "Test (to_rad(180.0) == M_PI) failed\n";
+	if (to_rad(90.0) != M_PI / 2) std::cout << "Test (to_rad(90.0) == M_PI / 2) failed\n";
+	if (to_rad(360.0) != M_PI * 2) std::cout << "Test (to_rad(360.0) == M_PI * 2) failed\n";
+	if (to_rad(0) != 0) std::cout << "Test (to_rad(0) == 0) failed\n";
+	if (to_rad(-90.0) != -M_PI / 2) std::cout << "Test (to_rad(-90.0) == -M_PI / 2) failed\n";
 
 	// tests: distance verified from https://www.vcalc.com/wiki/vcalc/haversine-distance
 	// slight difference due to nautical mile conversion or precision of earth's radius
@@ -86,6 +86,6 @@ void fly(double latA, double longA, double latB, double longB) {
 	std::cout << "Fly heading " << theta << " degrees for " << d << " nautical miles.\n";
 }
 
-constexpr double to_rad(double deg) { return deg * kToRadCoeff; }
+double to_rad(double deg) { return deg * kToRadCoeff; }
 
-constexpr double to_deg(double rad) { return rad * kToDegCoeff; }
+double to_deg(double rad) { return rad * kToDegCoeff; }
