@@ -25,3 +25,5 @@ add_executable(hanoi hw1/hanoi.cpp)
 add_library(libtree hw1/Tree.cpp)
 add_executable(tree hw1/tree_main.cpp)
 target_link_libraries(tree PUBLIC libtree)
+
+add_executable(life hw1/life.cpp)
