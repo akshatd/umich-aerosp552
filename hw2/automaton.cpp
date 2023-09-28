@@ -11,8 +11,8 @@ const std::string kKwStates         = "-- states";
 const std::string kKwInitial        = "-- initial";
 const std::string kKwFinal          = "-- final";
 const std::string kKwTransitions    = "-- transitions";
-const std::string kKwTransitionFrom = "--";
-const std::string kKwTransitionTo   = "-->";
+const std::string kKwTransitionFrom = " -- ";
+const std::string kKwTransitionTo   = " --> ";
 const std::string kKwDelim          = " ";
 
 enum FileParseState {
@@ -21,6 +21,12 @@ enum FileParseState {
 	Initial,
 	Final,
 	Transitions,
+};
+
+struct Transition {
+		std::string from;
+		std::string input;
+		std::string to;
 };
 
 // class to store automaton
@@ -41,6 +47,9 @@ class Automaton {
 
 		void        parse_file(std::string file_name);
 		std::string clean_input(std::string input);
+		bool        run(std::string input);
+		Transition  process_transition(std::string transition);
+		bool        exists_in_set(std::string state, std::string set);
 };
 
 /*
@@ -85,21 +94,13 @@ bool automaton(std::string file, std::string input) {
 
 // Automaton function implementations
 
-Automaton::Automaton(std::string file_name) {
-	parse_file(file_name);
-	// print transitions
-
-	// for (size_t i = 0; i < num_transitions_; ++i) {
-	// 	std::cout << transitions_[i] << '\n';
-	// }
-}
+Automaton::Automaton(std::string file_name) { parse_file(file_name); }
 
 Automaton::~Automaton() {}
 
 bool Automaton::ProcessInput(std::string input) {
 	std::string cleaned_input = clean_input(input);
-	// do something
-	return true;
+	return run(cleaned_input);
 }
 
 void Automaton::parse_file(std::string file_name) {
@@ -207,4 +208,74 @@ std::string Automaton::clean_input(std::string input) {
 	}
 	std::cout << "Clean input: " << cleaned_input << '\n';
 	return cleaned_input;
+}
+
+bool Automaton::run(std::string input) {
+	std::string state = initial_;
+	std::string letter;
+	// , end, input;
+	Transition transition;
+	// Transition transition = process_transition(transitions_[0]);
+	for (char l : input) {
+		letter = std::string(1, l);
+		std::cout << "Processing letter: " << letter << '\n';
+		// check if letter is in alphabet
+		if (!exists_in_set(letter, alphabet_)) {
+			std::cout << "** Error: Letter " << letter << " does not exist in the alphabet\n";
+			return false;
+		}
+		// ideally done during file parsing but i dont want to deal with all the string arrays
+		// using vectors here would be more appropriate
+		for (size_t i = 0; i < num_transitions_; ++i) {
+			transition = process_transition(transitions_[i]);
+			// make the transition if possible
+			if (state == transition.from && letter == transition.input) {
+				// check if to state exists
+				if (!exists_in_set(transition.to, states_)) {
+					std::cout << "** Error: State " << transition.to << " does not exist\n";
+					return false;
+				}
+				// make the transition
+				std::cout << "Transitioning from " << transition.from << " to " << transition.to << '\n';
+				state = transition.to;
+				break;
+			}
+		}
+	}
+
+	// check if state is in final
+	if (exists_in_set(state, final_)) {
+		return true;
+	} else {
+		std::cout << "** Error: State " << transition.to << " is not a final state\n";
+		return false;
+	}
+}
+
+Transition Automaton::process_transition(std::string transition) {
+	std::string from  = transition.substr(0, transition.find(kKwTransitionFrom));
+	std::string input = transition.substr(
+		from.length() + kKwTransitionFrom.length(),
+		transition.find(kKwTransitionTo) - (from.length() + kKwTransitionFrom.length()));
+	std::string to = transition.substr(
+		from.length() + kKwTransitionFrom.length() + input.length() + kKwTransitionTo.length(),
+		transition.length() - (from.length() + kKwTransitionFrom.length() + input.length() + kKwTransitionTo.length()));
+	return {from, input, to};
+}
+
+bool Automaton::exists_in_set(std::string state, std::string set) {
+	size_t      pos = 0;
+	std::string state_in_set;
+	while ((pos = set.find(kKwDelim)) != std::string::npos) {
+		state_in_set = set.substr(0, pos);
+		if (state == state_in_set) return true;
+		set.erase(0, pos + kKwDelim.length());
+	}
+
+	// check if the remaining string of set has the final state
+	if (state == set) {
+		return true;
+	} else {
+		return false;
+	}
 }
