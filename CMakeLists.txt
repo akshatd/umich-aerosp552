@@ -18,7 +18,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -pedantic -Wsha
 set(INCLUDE_DIR include)
 set(TEST_DIR test)
 
-# executables for hw1
+# execs for hw1
 add_executable(navigation hw1/navigation.cpp)
 add_executable(hanoi hw1/hanoi.cpp)
 
@@ -27,3 +27,6 @@ add_executable(tree hw1/tree_main.cpp)
 target_link_libraries(tree PUBLIC libtree)
 
 add_executable(life hw1/life.cpp)
+
+# execs for hw2
+add_executable(automaton hw2/automaton.cpp)
