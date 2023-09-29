@@ -1,0 +1,15 @@
+-- alphabet
+a b
+-- states
+1a 2 3c
+-- initial
+4
+-- final
+1a 3c
+-- transitions
+1a -- a --> 2
+1a -- b --> 1a
+2 -- a --> 3c
+2 -- b --> 2
+3c -- a --> 3c
+3c -- b --> 3c
