@@ -60,10 +60,23 @@ class Automaton {
 bool automaton(std::string file, std::string input);
 
 int main() {
-	std::cout << "hello\n";
+	// test cases
+	std::cout << " -- TESTS -- \n";
+	std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "aa") << '\n';
+	std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "bb") << '\n';
+	std::cout << "Expected 0: Accepted by automaton: " << automaton(kInputFile, "ab") << '\n';
+	std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "bbbbabbbbba") << '\n';
+	std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "`;'aa[]") << '\n';
+	std::cout << "Expected 1: Accepted by automaton: " << automaton("file1.txt", "aa") << '\n';
+	std::cout << "Expected 0: Accepted by automaton: " << automaton("file2.txt", "aa") << '\n';
+	std::cout << "Expected 0: Accepted by automaton: " << automaton("file3.txt", "aa") << '\n';
+	std::cout << "Expected 0: Accepted by automaton: " << automaton("file4.txt", "aa") << '\n';
+	std::cout << "Expected 0: Accepted by automaton: " << automaton("file5.txt", "aa") << '\n';
 
 	std::string input;
 	while (true) {
+		std::cin.clear();
+		std::cout << "-- USER INPUT -- \n";
 		std::cout << "Enter input: ";
 		if (std::cin >> input) {
 			break;
@@ -73,11 +86,7 @@ int main() {
 			std::cin.ignore();
 		}
 	}
-	if (automaton(kInputFile, input)) {
-		std::cout << "Automaton accepts \"" << input << "\"\n";
-	} else {
-		std::cout << "Automaton rejects \"" << input << "\"\n";
-	}
+	std::cout << "Accepted by automaton: " << automaton(kInputFile, input) << '\n';
 
 	return 0;
 }
@@ -126,7 +135,7 @@ void Automaton::parse_file(std::string file_name) {
 						can_continue = false;
 					} else {
 						alphabet_ = line;
-						std::cout << "Alphabet found: " << alphabet_ << '\n';
+						// std::cout << "Alphabet found: " << alphabet_ << '\n';
 						kw_found = false;
 						state    = States;
 					}
@@ -145,7 +154,7 @@ void Automaton::parse_file(std::string file_name) {
 						can_continue = false;
 					} else {
 						states_ = line;
-						std::cout << "States found: " << states_ << '\n';
+						// std::cout << "States found: " << states_ << '\n';
 						kw_found = false;
 						state    = Initial;
 					}
@@ -164,7 +173,7 @@ void Automaton::parse_file(std::string file_name) {
 						can_continue = false;
 					} else {
 						initial_ = line;
-						std::cout << "Initial found: " << initial_ << '\n';
+						// std::cout << "Initial found: " << initial_ << '\n';
 						if (!exists_in_set(initial_, states_)) {
 							std::cout << "** Error: State " << initial_ << " does not exist\n";
 							can_continue = false;
@@ -184,7 +193,7 @@ void Automaton::parse_file(std::string file_name) {
 					kw_found = true;
 				} else if (kw_found) {
 					final_ = line;
-					std::cout << "Final found: " << final_ << '\n';
+					// std::cout << "Final found: " << final_ << '\n';
 					kw_found = false;
 					state    = Transitions;
 				} else {
@@ -198,7 +207,7 @@ void Automaton::parse_file(std::string file_name) {
 					kw_found = true;
 				} else if (kw_found) {
 					transitions_[num_transitions_++] = line;
-					std::cout << "Transition found: " << line << '\n';
+					// std::cout << "Transition found: " << line << '\n';
 				} else {
 					std::cout << "** Error parsing Transitions\n";
 					can_continue = false;
@@ -216,7 +225,7 @@ void Automaton::parse_file(std::string file_name) {
 }
 
 std::string Automaton::clean_input(std::string input) {
-	std::cout << "Input received: \"" << input << "\"\n";
+	// std::cout << "Input received: \"" << input << "\"\n";
 
 	std::string cleaned_input;
 	for (char i : input) {
@@ -226,13 +235,13 @@ std::string Automaton::clean_input(std::string input) {
 			(i >= '0' && i <= '9') || //
 			(i >= 'A' && i <= 'Z') || //
 			(i >= 'a' && i <= 'z')) {
-			std::cout << "Adding to input: \"" << std::string(1, i) << "\"\n";
+			// std::cout << "Adding to input: \"" << std::string(1, i) << "\"\n";
 			cleaned_input += i;
 		} else {
 			std::cout << "** Ignoring \"" << std::string(1, i) << "\", input must be 0-9, a-z or A-Z\n";
 		}
 	}
-	std::cout << "Clean input: " << cleaned_input << '\n';
+	// std::cout << "Clean input: " << cleaned_input << '\n';
 	return cleaned_input;
 }
 
@@ -244,7 +253,7 @@ bool Automaton::run(std::string input) {
 	// Transition transition = process_transition(transitions_[0]);
 	for (char l : input) {
 		letter = std::string(1, l);
-		std::cout << "Processing letter: " << letter << '\n';
+		// std::cout << "Processing letter: " << letter << '\n';
 		// check if letter is in alphabet
 		if (!exists_in_set(letter, alphabet_)) {
 			std::cout << "** Error: Letter " << letter << " does not exist in the alphabet\n";
@@ -262,7 +271,7 @@ bool Automaton::run(std::string input) {
 					return false;
 				}
 				// make the transition
-				std::cout << "Transitioning from " << transition.from << " to " << transition.to << '\n';
+				// std::cout << "Transitioning from " << transition.from << " to " << transition.to << '\n';
 				state = transition.to;
 				break;
 			}
