@@ -114,18 +114,25 @@ void Automaton::parse_file(std::string file_name) {
 	FileParseState state    = Alphabet;
 	bool           kw_found = false;
 	num_transitions_        = 0;
-	for (std::string line; std::getline(input_file, line);) {
+	bool can_continue       = true;
+	for (std::string line; std::getline(input_file, line) && can_continue;) {
 		switch (state) {
 			case Alphabet:
 				if (line == kKwAlphabet) {
 					kw_found = true;
 				} else if (kw_found) {
-					alphabet_ = line;
-					std::cout << "Alphabet found: " << alphabet_ << '\n';
-					kw_found = false;
-					state    = States;
+					if (line.empty()) {
+						std::cout << "** Error parsing Alphabet, cannot be empty\n";
+						can_continue = false;
+					} else {
+						alphabet_ = line;
+						std::cout << "Alphabet found: " << alphabet_ << '\n';
+						kw_found = false;
+						state    = States;
+					}
 				} else {
 					std::cout << "** Error parsing Alphabet\n";
+					can_continue = false;
 				}
 				break;
 
@@ -133,12 +140,18 @@ void Automaton::parse_file(std::string file_name) {
 				if (line == kKwStates) {
 					kw_found = true;
 				} else if (kw_found) {
-					states_ = line;
-					std::cout << "States found: " << states_ << '\n';
-					kw_found = false;
-					state    = Initial;
+					if (line.empty()) {
+						std::cout << "** Error parsing States, cannot be empty\n";
+						can_continue = false;
+					} else {
+						states_ = line;
+						std::cout << "States found: " << states_ << '\n';
+						kw_found = false;
+						state    = Initial;
+					}
 				} else {
 					std::cout << "** Error parsing States\n";
+					can_continue = false;
 				}
 				break;
 
@@ -146,12 +159,23 @@ void Automaton::parse_file(std::string file_name) {
 				if (line == kKwInitial) {
 					kw_found = true;
 				} else if (kw_found) {
-					initial_ = line;
-					std::cout << "Initial found: " << initial_ << '\n';
-					kw_found = false;
-					state    = Final;
+					if (line.find(kKwDelim) != std::string::npos) {
+						std::cout << "** Error parsing Inital, cannot have multiple\n";
+						can_continue = false;
+					} else {
+						initial_ = line;
+						std::cout << "Initial found: " << initial_ << '\n';
+						if (!exists_in_set(initial_, states_)) {
+							std::cout << "** Error: State " << initial_ << " does not exist\n";
+							can_continue = false;
+						} else {
+							kw_found = false;
+							state    = Final;
+						}
+					}
 				} else {
 					std::cout << "** Error parsing Initial\n";
+					can_continue = false;
 				}
 				break;
 
@@ -165,6 +189,7 @@ void Automaton::parse_file(std::string file_name) {
 					state    = Transitions;
 				} else {
 					std::cout << "** Error parsing Final\n";
+					can_continue = false;
 				}
 				break;
 
@@ -176,6 +201,7 @@ void Automaton::parse_file(std::string file_name) {
 					std::cout << "Transition found: " << line << '\n';
 				} else {
 					std::cout << "** Error parsing Transitions\n";
+					can_continue = false;
 				}
 				break;
 
@@ -183,8 +209,8 @@ void Automaton::parse_file(std::string file_name) {
 				break;
 		}
 	}
-	if (state != Transitions) {
-		std::cout << "** Error parsing file, missing keywords. Stuck at " << std::to_string(state) << '\n';
+	if (state != Transitions || !can_continue) {
+		std::cout << "** Error parsing file, maybe missing keywords? Stuck at " << std::to_string(state) << '\n';
 		throw("");
 	}
 }
