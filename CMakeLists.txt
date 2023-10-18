@@ -30,3 +30,6 @@ add_executable(life hw1/life.cpp)
 
 # execs for hw2
 add_executable(automaton hw2/automaton.cpp)
+
+# execs for hw3
+add_executable(turing hw3/turing.cpp)

@@ -1,0 +1,19 @@
+-- alphabet
+a b
+-- tape alphabet
+w E c d
+-- states
+1 2 3
+-- initial
+1
+-- accept
+2
+-- reject
+3
+-- transitions
+1 -- a,b,L --> 2
+1 -- b,a,L --> 1
+2 -- a,b,R --> 3
+2 -- b,a,R --> 2
+3 -- a,b,L --> 3
+3 -- b,a,R --> 3
