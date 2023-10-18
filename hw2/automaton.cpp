@@ -62,16 +62,16 @@ bool automaton(std::string file, std::string input);
 int main() {
 	// test cases
 	std::cout << " -- TESTS -- \n";
-	std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "aa") << '\n';
-	std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "bb") << '\n';
-	std::cout << "Expected 0: Accepted by automaton: " << automaton(kInputFile, "ab") << '\n';
-	std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "bbbbabbbbba") << '\n';
-	std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "`;'aa[]") << '\n';
-	std::cout << "Expected 1: Accepted by automaton: " << automaton("file1.txt", "aa") << '\n';
-	std::cout << "Expected 0: Accepted by automaton: " << automaton("file2.txt", "aa") << '\n';
-	std::cout << "Expected 0: Accepted by automaton: " << automaton("file3.txt", "aa") << '\n';
-	std::cout << "Expected 0: Accepted by automaton: " << automaton("file4.txt", "aa") << '\n';
-	std::cout << "Expected 0: Accepted by automaton: " << automaton("file5.txt", "aa") << '\n';
+	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "aa") << '\n';
+	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "bb") << '\n';
+	// std::cout << "Expected 0: Accepted by automaton: " << automaton(kInputFile, "ab") << '\n';
+	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "bbbbabbbbba") << '\n';
+	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kInputFile, "`;'aa[]") << '\n';
+	// std::cout << "Expected 1: Accepted by automaton: " << automaton("file1.txt", "aa") << '\n';
+	// std::cout << "Expected 0: Accepted by automaton: " << automaton("file2.txt", "aa") << '\n';
+	// std::cout << "Expected 0: Accepted by automaton: " << automaton("file3.txt", "aa") << '\n';
+	// std::cout << "Expected 0: Accepted by automaton: " << automaton("file4.txt", "aa") << '\n';
+	// std::cout << "Expected 0: Accepted by automaton: " << automaton("file5.txt", "aa") << '\n';
 
 	std::string input;
 	while (true) {
