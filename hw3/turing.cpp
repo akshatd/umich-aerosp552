@@ -24,7 +24,15 @@ int main() {
 	std::cout << "- 11 REJECT: " << turing("astarbstar.dat", "EAB") << '\n';
 	std::cout << "- 12 ACCEPT: " << turing("astarbstar.dat", "E") << '\n';
 	std::cout << "- 13 ACCEPT: " << turing("astarbstar.dat", "Eaaaa") << '\n';
-	std::cout << "- 13 ACCEPT: " << turing("astarbstar.dat", "Eaaabb") << '\n';
+	std::cout << "- 14 ACCEPT: " << turing("astarbstar.dat", "Eaaabb") << '\n';
+	std::cout << "- 15 ACCEPT: " << turing("ex4.dat", "Ea") << '\n';
+	std::cout << "- 16 ACCEPT: " << turing("ex4.dat", "E") << '\n';
+	std::cout << "- 17 REJECT: " << turing("ex4.dat", "Eb") << '\n';
+	std::cout << "- 18 REJECT: " << turing("ex4.dat", "Eaaaaaaaaaaaaaab") << '\n';
+	std::cout << "- 19 REJECT: " << turing("ex4.dat", "Eaabaa") << '\n';
+	std::cout << "- 20 ACCEPT: " << turing("ex4.dat", "Eaa") << '\n';
+	std::cout << "- 21 ACCEPT: " << turing("ex4.dat", "Eaaa") << '\n';
+	std::cout << "- 22 ACCEPT: " << turing("ex4.dat", "Eaaaa") << '\n';
 	return 0;
 
 	std::string input;
@@ -290,11 +298,13 @@ std::string TuringMachine::run(std::string input) {
 	}
 
 	// check if state is in accept
-	if (!exists_in_set(state, accept_)) {
-		std::cout << "** Error: State <" << transition.to << "> is not an accepting state\n";
+	if (exists_in_set(state, accept_)) {
+		return input;
+	} else if (exists_in_set(state, reject_)) {
 		return kOutputReject;
 	} else {
-		return input;
+		std::cout << "** Error: Final state <" << transition.to << "> is not an accepting or rejecting state\n";
+		return kOutputReject;
 	}
 }
 
