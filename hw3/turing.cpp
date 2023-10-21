@@ -4,12 +4,13 @@
 
 #include "turing.h"
 
-const std::string kTMDefinition = "lowercase.dat";
+const std::string kTMDefinition = "ex4.dat";
 
 std::string turing(std::string file, std::string input);
 
 int main() {
 	// test cases
+#ifdef DEBUG
 	std::cout << " -- TESTS -- \n";
 	std::cout << "- 1 ACCEPT: " << turing("lowercase.dat", "EAB") << '\n';
 	std::cout << "- 2 ACCEPT: " << turing("lowercase.dat", "EABCDD") << '\n';
@@ -34,6 +35,7 @@ int main() {
 	std::cout << "- 21 ACCEPT: " << turing("ex4.dat", "Eaaa") << '\n';
 	std::cout << "- 22 ACCEPT: " << turing("ex4.dat", "Eaaaa") << '\n';
 	return 0;
+#endif
 
 	std::string input;
 	while (true) {
