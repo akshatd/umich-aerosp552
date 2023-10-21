@@ -52,7 +52,7 @@ class TuringMachine {
 
 	private:
 		std::string alphabet_;
-		std::string tape_;
+		std::string tape_alphabet_;
 		std::string states_;
 		std::string initial_;
 		std::string accept_;

@@ -4,13 +4,13 @@
 
 #include "turing.h"
 
-const std::string kTMDefinition = "turing.txt";
+const std::string kTMDefinition = "lowercase.dat";
 
 std::string turing(std::string file, std::string input);
 
 int main() {
 	// test cases
-	std::cout << " -- TESTS -- \n";
+	// std::cout << " -- TESTS -- \n";
 	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kTMDefinition, "aa") << '\n';
 	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kTMDefinition, "bb") << '\n';
 	// std::cout << "Expected 0: Accepted by automaton: " << automaton(kTMDefinition, "ab") << '\n';
@@ -35,7 +35,7 @@ int main() {
 			std::cin.ignore();
 		}
 	}
-	std::cout << "Accepted by automaton: " << turing(kTMDefinition, input) << '\n';
+	std::cout << turing(kTMDefinition, input) << '\n';
 
 	return 0;
 }
@@ -43,10 +43,10 @@ int main() {
 std::string turing(std::string file, std::string input) {
 	try {
 		TuringMachine tm(file);
-		return tm.ProcessInput(input);
+		return std::string("Output from Turing Machine: ") + tm.ProcessInput(input);
 	} catch (...) {
 		std::cout << "** Error occurred :(\n";
-		return kOutputReject;
+		return std::string("Output from Turing Machine: ") + kOutputReject;
 	}
 }
 
@@ -84,7 +84,7 @@ void TuringMachine::parse_file(std::string file_name) {
 						can_continue = false;
 					} else {
 						alphabet_ = line;
-						std::cout << "Alphabet found: " << alphabet_ << '\n';
+						// std::cout << "Alphabet found: " << alphabet_ << '\n';
 						kw_found = false;
 						state    = Tape;
 					}
@@ -102,8 +102,8 @@ void TuringMachine::parse_file(std::string file_name) {
 						std::cout << "** Error parsing Tape Alphabet, cannot be empty\n";
 						can_continue = false;
 					} else {
-						tape_ = line;
-						std::cout << "Tape Alphabet found: " << tape_ << '\n';
+						tape_alphabet_ = line;
+						// std::cout << "Tape Alphabet found: " << tape_alphabet_ << '\n';
 						kw_found = false;
 						state    = States;
 					}
@@ -122,7 +122,7 @@ void TuringMachine::parse_file(std::string file_name) {
 						can_continue = false;
 					} else {
 						states_ = line;
-						std::cout << "States found: " << states_ << '\n';
+						// std::cout << "States found: " << states_ << '\n';
 						kw_found = false;
 						state    = Initial;
 					}
@@ -137,13 +137,13 @@ void TuringMachine::parse_file(std::string file_name) {
 					kw_found = true;
 				} else if (kw_found) {
 					if (line.find(kKwDelim) != std::string::npos) {
-						std::cout << "** Error parsing Inital, cannot have multiple\n";
+						std::cout << "** Error parsing Inital state, cannot have multiple\n";
 						can_continue = false;
 					} else {
 						initial_ = line;
-						std::cout << "Initial found: " << initial_ << '\n';
+						// std::cout << "Initial state found: " << initial_ << '\n';
 						if (!exists_in_set(initial_, states_)) {
-							std::cout << "** Error: State " << initial_ << " does not exist in states\n";
+							std::cout << "** Error: Initial state " << initial_ << " does not exist in states\n";
 							can_continue = false;
 						} else {
 							kw_found = false;
@@ -151,7 +151,7 @@ void TuringMachine::parse_file(std::string file_name) {
 						}
 					}
 				} else {
-					std::cout << "** Error parsing Initial\n";
+					std::cout << "** Error parsing Initial state\n";
 					can_continue = false;
 				}
 				break;
@@ -161,11 +161,11 @@ void TuringMachine::parse_file(std::string file_name) {
 					kw_found = true;
 				} else if (kw_found) {
 					accept_ = line;
-					std::cout << "Accept state found: " << accept_ << '\n';
+					// std::cout << "Accept state found: " << accept_ << '\n';
 					kw_found = false;
 					state    = Reject;
 				} else {
-					std::cout << "** Error parsing Accept\n";
+					std::cout << "** Error parsing Accept state\n";
 					can_continue = false;
 				}
 				break;
@@ -175,11 +175,11 @@ void TuringMachine::parse_file(std::string file_name) {
 					kw_found = true;
 				} else if (kw_found) {
 					reject_ = line;
-					std::cout << "Reject state found: " << reject_ << '\n';
+					// std::cout << "Reject state found: " << reject_ << '\n';
 					kw_found = false;
 					state    = Transitions;
 				} else {
-					std::cout << "** Error parsing Reject\n";
+					std::cout << "** Error parsing Reject state\n";
 					can_continue = false;
 				}
 				break;
@@ -189,7 +189,7 @@ void TuringMachine::parse_file(std::string file_name) {
 					kw_found = true;
 				} else if (kw_found) {
 					transitions_[num_transitions_++] = line;
-					std::cout << "Transition found: " << line << '\n';
+					// std::cout << "Transition found: " << line << '\n';
 				} else {
 					std::cout << "** Error parsing Transitions\n";
 					can_continue = false;
@@ -228,17 +228,19 @@ std::string TuringMachine::clean_input(std::string input) {
 }
 
 std::string TuringMachine::run(std::string input) {
-	std::string state = initial_;
+	std::string state    = initial_;
+	size_t      tape_pos = 0;
 	std::string letter;
-	// , end, input;
-	Transition transition;
-	// Transition transition = process_transition(transitions_[0]);
-	for (char l : input) {
-		letter = std::string(1, l);
-		// std::cout << "Processing letter: " << letter << '\n';
+	Transition  transition;
+
+	while (!exists_in_set(state, reject_) && !exists_in_set(state, accept_)) {
+		// if tape position exceeds the length, add a space to simulate infinite spaces
+		if (tape_pos > input.size() - 1) input += "w";
+		letter = input.at(tape_pos);
+		std::cout << "Processing letter: " << letter << " at position " << tape_pos << '\n';
 		// check if letter is in alphabet
-		if (!exists_in_set(letter, alphabet_)) {
-			std::cout << "** Error: Letter " << letter << " does not exist in the alphabet\n";
+		if (!exists_in_set(letter, alphabet_) && !exists_in_set(letter, tape_alphabet_)) {
+			std::cout << "** Error: Processing Letter: " << letter << " does not exist in the alphabet\n";
 			return kOutputReject;
 		}
 		// ideally done during file parsing but i dont want to deal with all the string arrays
@@ -246,45 +248,75 @@ std::string TuringMachine::run(std::string input) {
 		for (size_t i = 0; i < num_transitions_; ++i) {
 			transition = process_transition(transitions_[i]);
 			// make the transition if possible
-			if (state == transition.from && letter == transition.input) {
+			if (letter == transition.input && state == transition.from) {
 				// check if to state exists
 				if (!exists_in_set(transition.to, states_)) {
 					std::cout << "** Error: State " << transition.to << " does not exist\n";
 					return kOutputReject;
 				}
+				// check if trying to move past left end marker
+				if (tape_pos == 0 && transition.move == kMoveLeft) {
+					std::cout << "** Error: Trying to transition left of left end marker\n";
+					return kOutputReject;
+				}
+				// check if trying to overwrite left end marker
+				if (tape_pos == 0 && transition.output != kKwLeftMarker) {
+					std::cout << "** Error: Trying to overwrite left end marker\n";
+					return kOutputReject;
+				}
+				// check if trying to write something not part of the full alphabet
+				if (!exists_in_set(transition.output, alphabet_) && !exists_in_set(transition.output, tape_alphabet_)) {
+					std::cout << "** Error: Trying to write " << transition.output << " which is not part of the alphabet\n";
+					return kOutputReject;
+				}
+
+				// write to tape
+				std::cout << "Writing " << transition.output << " to tape at position " << tape_pos << '\n';
+				input.replace(tape_pos, transition.output.size(), transition.output);
+				// move
+				if (transition.move == kMoveLeft) {
+					std::cout << "Moving left\n";
+					tape_pos--;
+				} else if (transition.move == kMoveRight) {
+					std::cout << "Moving right\n";
+					tape_pos++;
+				} else {
+					std::cout << "** Error: Move " << transition.move << " is not a valid move\n";
+					return kOutputReject;
+				}
 				// make the transition
-				// std::cout << "Transitioning from " << transition.from << " to " << transition.to << '\n';
+				std::cout << "Transitioning from " << transition.from << " to " << transition.to << '\n';
 				state = transition.to;
+
 				break;
 			}
 		}
 	}
 
-	// check if state is in final
-	if (exists_in_set(state, reject_)) {
-		std::cout << "** Error: State " << transition.to << " is not a final state\n";
+	// check if state is in accept
+	if (!exists_in_set(state, accept_)) {
+		std::cout << "** Error: State " << transition.to << " is not an accepting state\n";
 		return kOutputReject;
 	} else {
-		return tape_;
+		return input;
 	}
 }
 
 Transition TuringMachine::process_transition(std::string transition) {
 	// find from
-	size_t      pos  = 0;
-	std::string from = transition.substr(pos, transition.find(kKwTransitionFrom));
+	std::string from = transition.substr(0, transition.find(kKwTransitionFrom));
+	transition.erase(0, from.length() + kKwTransitionFrom.length());
 	// find input
-	pos += from.length() + kKwTransitionFrom.length();
-	std::string input = transition.substr(pos, transition.find(kKwTransitionDelim) - pos);
+	std::string input = transition.substr(0, transition.find(kKwTransitionDelim));
+	transition.erase(0, input.length() + kKwTransitionDelim.length());
 	// find output
-	pos += input.length() + kKwTransitionDelim.length();
-	std::string output = transition.substr(pos, transition.find(kKwTransitionDelim) - pos);
+	std::string output = transition.substr(0, transition.find(kKwTransitionDelim));
+	transition.erase(0, output.length() + kKwTransitionDelim.length());
 	// find move
-	pos += output.length() + kKwTransitionDelim.length();
-	std::string move = transition.substr(pos, transition.find(kKwTransitionTo) - pos);
+	std::string move = transition.substr(0, transition.find(kKwTransitionTo));
+	transition.erase(0, move.length() + kKwTransitionTo.length());
 	// find to
-	pos += move.length() + kKwTransitionTo.length();
-	std::string to = transition.substr(pos, transition.length() - pos);
+	std::string to = transition;
 	return {clean_input(from), clean_input(input), clean_input(output), clean_input(move), clean_input(to)};
 }
 
