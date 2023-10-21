@@ -61,10 +61,12 @@ class TuringMachine {
 		size_t      num_transitions_;
 
 		void        parse_file(std::string file_name);
-		std::string clean_input(std::string input);
 		std::string run(std::string input);
-		Transition  process_transition(std::string transition);
-		bool        exists_in_set(std::string state, std::string set);
 };
+
+std::string get_alphanum(std::string input);
+std::string unwindowsify(std::string windows_style_ending);
+Transition  process_transition(std::string transition);
+bool        exists_in_set(std::string state, std::string set);
 
 #endif

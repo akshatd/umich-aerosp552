@@ -11,23 +11,20 @@ std::string turing(std::string file, std::string input);
 int main() {
 	// test cases
 	std::cout << " -- TESTS -- \n";
-	std::cout << "- Expected ACCEPT: " << turing("lowercase.dat", "EAB") << '\n';
-	std::cout << "- Expected ACCEPT: " << turing("lowercase.dat", "EABCDD") << '\n';
-	std::cout << "- Expected REJECT: " << turing("lowercase.dat", "ab") << '\n';
-	std::cout << "- Expected REJECT: " << turing("lowercase.dat", "Eab") << '\n';
-	std::cout << "- Expected REJECT: " << turing("lowercase.dat", "EAF") << '\n';
-	std::cout << "- Expected REJECT: " << turing("lowercasebad0.dat", "EAB") << '\n';
-	std::cout << "- Expected REJECT: " << turing("lowercasebad1.dat", "EAB") << '\n';
-	std::cout << "- Expected REJECT: " << turing("lowercasebad2.dat", "EAB") << '\n';
-	std::cout << "- Expected REJECT: " << turing("lowercasebad3.dat", "EAB") << '\n';
-	std::cout << "- Expected REJECT: " << turing("lowercasebad4.dat", "EAB") << '\n';
-	// std::cout << "Expected ACCEPT: " << turing(kTMDefinition, "bbbbabbbbba") << '\n';
-	// std::cout << "Expected ACCEPT: " << turing(kTMDefinition, "`;'aa[]") << '\n';
-	// std::cout << "Expected ACCEPT: " << turing("file1.txt", "aa") << '\n';
-	// std::cout << "Expected REJECT: " << turing("file2.txt", "aa") << '\n';
-	// std::cout << "Expected REJECT: " << turing("file3.txt", "aa") << '\n';
-	// std::cout << "Expected REJECT: " << turing("file4.txt", "aa") << '\n';
-	// std::cout << "Expected REJECT: " << turing("file5.txt", "aa") << '\n';
+	std::cout << "- 1 ACCEPT: " << turing("lowercase.dat", "EAB") << '\n';
+	std::cout << "- 2 ACCEPT: " << turing("lowercase.dat", "EABCDD") << '\n';
+	std::cout << "- 3 REJECT: " << turing("lowercase.dat", "ab") << '\n';
+	std::cout << "- 4 REJECT: " << turing("lowercase.dat", "Eab") << '\n';
+	std::cout << "- 5 REJECT: " << turing("lowercase.dat", "EAF") << '\n';
+	std::cout << "- 6 REJECT: " << turing("lowercasebad0.dat", "EAB") << '\n';
+	std::cout << "- 7 REJECT: " << turing("lowercasebad1.dat", "EAB") << '\n';
+	std::cout << "- 8 REJECT: " << turing("lowercasebad2.dat", "EAB") << '\n';
+	std::cout << "- 9 REJECT: " << turing("lowercasebad3.dat", "EAB") << '\n';
+	std::cout << "- 10 REJECT: " << turing("lowercasebad4.dat", "EAB") << '\n';
+	std::cout << "- 11 REJECT: " << turing("astarbstar.dat", "EAB") << '\n';
+	std::cout << "- 12 ACCEPT: " << turing("astarbstar.dat", "E") << '\n';
+	std::cout << "- 13 ACCEPT: " << turing("astarbstar.dat", "Eaaaa") << '\n';
+	std::cout << "- 13 ACCEPT: " << turing("astarbstar.dat", "Eaaabb") << '\n';
 	return 0;
 
 	std::string input;
@@ -43,7 +40,7 @@ int main() {
 			std::cin.ignore();
 		}
 	}
-	std::cout << turing(kTMDefinition, input) << '\n';
+	std::cout << "Output from Turing Machine: " << turing(kTMDefinition, input) << '\n';
 
 	return 0;
 }
@@ -51,10 +48,10 @@ int main() {
 std::string turing(std::string file, std::string input) {
 	try {
 		TuringMachine tm(file);
-		return std::string("Output from Turing Machine: ") + tm.ProcessInput(input);
+		return tm.ProcessInput(input);
 	} catch (...) {
 		std::cout << "** Error occurred :(\n";
-		return std::string("Output from Turing Machine: ") + kOutputReject;
+		return kOutputReject;
 	}
 }
 
@@ -65,7 +62,7 @@ TuringMachine::TuringMachine(std::string file_name) { parse_file(file_name); }
 TuringMachine::~TuringMachine() {}
 
 std::string TuringMachine::ProcessInput(std::string input) {
-	std::string cleaned_input = clean_input(input);
+	std::string cleaned_input = get_alphanum(input);
 	return run(cleaned_input);
 }
 
@@ -82,6 +79,7 @@ void TuringMachine::parse_file(std::string file_name) {
 	num_transitions_        = 0;
 	bool can_continue       = true;
 	for (std::string line; std::getline(input_file, line) && can_continue;) {
+		line = unwindowsify(line);
 		switch (state) {
 			case Alphabet:
 				if (line == kKwAlphabet) {
@@ -214,27 +212,6 @@ void TuringMachine::parse_file(std::string file_name) {
 	}
 }
 
-std::string TuringMachine::clean_input(std::string input) {
-	// std::cout << "Input received: \"" << input << "\"\n";
-
-	std::string cleaned_input;
-	for (char i : input) {
-		// check if the input is a number or letter
-		// letters are case sensitive
-		if (
-			(i >= '0' && i <= '9') || //
-			(i >= 'A' && i <= 'Z') || //
-			(i >= 'a' && i <= 'z')) {
-			// std::cout << "Adding to input: \"" << std::string(1, i) << "\"\n";
-			cleaned_input += i;
-		} else {
-			std::cout << "** Ignoring \"" << std::string(1, i) << "\", input must be 0-9, a-z or A-Z\n";
-		}
-	}
-	// std::cout << "Clean input: " << cleaned_input << '\n';
-	return cleaned_input;
-}
-
 std::string TuringMachine::run(std::string input) {
 	// reject if left end marker is not present
 	if (std::string(1, input.at(0)) != kKwLeftMarker) {
@@ -321,7 +298,37 @@ std::string TuringMachine::run(std::string input) {
 	}
 }
 
-Transition TuringMachine::process_transition(std::string transition) {
+std::string get_alphanum(std::string input) {
+	// std::cout << "Input received: \"" << input << "\"\n";
+
+	std::string cleaned_input;
+	for (char i : input) {
+		// check if the input is a number or letter
+		// letters are case sensitive
+		if (
+			(i >= '0' && i <= '9') || //
+			(i >= 'A' && i <= 'Z') || //
+			(i >= 'a' && i <= 'z')) {
+			// std::cout << "Adding to input: \"" << std::string(1, i) << "\"\n";
+			cleaned_input += i;
+		} else {
+			std::cout << "** Ignoring \"" << std::string(1, i) << "\", input must be 0-9, a-z or A-Z\n";
+		}
+	}
+	// std::cout << "Clean input: " << cleaned_input << '\n';
+	return cleaned_input;
+}
+
+std::string unwindowsify(std::string windows_style_ending) {
+	// remove windows style ending that remains after a line is read
+	if (windows_style_ending.at(windows_style_ending.size() - 1) == '\r') {
+		return windows_style_ending.substr(0, windows_style_ending.size() - 1);
+	} else {
+		return windows_style_ending;
+	}
+}
+
+Transition process_transition(std::string transition) {
 	// find from
 	std::string from = transition.substr(0, transition.find(kKwTransitionFrom));
 	transition.erase(0, from.length() + kKwTransitionFrom.length());
@@ -336,10 +343,10 @@ Transition TuringMachine::process_transition(std::string transition) {
 	transition.erase(0, move.length() + kKwTransitionTo.length());
 	// find to
 	std::string to = transition;
-	return {clean_input(from), clean_input(input), clean_input(output), clean_input(move), clean_input(to)};
+	return {get_alphanum(from), get_alphanum(input), get_alphanum(output), get_alphanum(move), get_alphanum(to)};
 }
 
-bool TuringMachine::exists_in_set(std::string state, std::string set) {
+bool exists_in_set(std::string state, std::string set) {
 	size_t      pos = 0;
 	std::string state_in_set;
 	while ((pos = set.find(kKwDelim)) != std::string::npos) {
