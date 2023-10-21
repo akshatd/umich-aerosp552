@@ -10,17 +10,25 @@ std::string turing(std::string file, std::string input);
 
 int main() {
 	// test cases
-	// std::cout << " -- TESTS -- \n";
-	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kTMDefinition, "aa") << '\n';
-	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kTMDefinition, "bb") << '\n';
-	// std::cout << "Expected 0: Accepted by automaton: " << automaton(kTMDefinition, "ab") << '\n';
-	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kTMDefinition, "bbbbabbbbba") << '\n';
-	// std::cout << "Expected 1: Accepted by automaton: " << automaton(kTMDefinition, "`;'aa[]") << '\n';
-	// std::cout << "Expected 1: Accepted by automaton: " << automaton("file1.txt", "aa") << '\n';
-	// std::cout << "Expected 0: Accepted by automaton: " << automaton("file2.txt", "aa") << '\n';
-	// std::cout << "Expected 0: Accepted by automaton: " << automaton("file3.txt", "aa") << '\n';
-	// std::cout << "Expected 0: Accepted by automaton: " << automaton("file4.txt", "aa") << '\n';
-	// std::cout << "Expected 0: Accepted by automaton: " << automaton("file5.txt", "aa") << '\n';
+	std::cout << " -- TESTS -- \n";
+	std::cout << "- Expected ACCEPT: " << turing("lowercase.dat", "EAB") << '\n';
+	std::cout << "- Expected ACCEPT: " << turing("lowercase.dat", "EABCDD") << '\n';
+	std::cout << "- Expected REJECT: " << turing("lowercase.dat", "ab") << '\n';
+	std::cout << "- Expected REJECT: " << turing("lowercase.dat", "Eab") << '\n';
+	std::cout << "- Expected REJECT: " << turing("lowercase.dat", "EAF") << '\n';
+	std::cout << "- Expected REJECT: " << turing("lowercasebad0.dat", "EAB") << '\n';
+	std::cout << "- Expected REJECT: " << turing("lowercasebad1.dat", "EAB") << '\n';
+	std::cout << "- Expected REJECT: " << turing("lowercasebad2.dat", "EAB") << '\n';
+	std::cout << "- Expected REJECT: " << turing("lowercasebad3.dat", "EAB") << '\n';
+	std::cout << "- Expected REJECT: " << turing("lowercasebad4.dat", "EAB") << '\n';
+	// std::cout << "Expected ACCEPT: " << turing(kTMDefinition, "bbbbabbbbba") << '\n';
+	// std::cout << "Expected ACCEPT: " << turing(kTMDefinition, "`;'aa[]") << '\n';
+	// std::cout << "Expected ACCEPT: " << turing("file1.txt", "aa") << '\n';
+	// std::cout << "Expected REJECT: " << turing("file2.txt", "aa") << '\n';
+	// std::cout << "Expected REJECT: " << turing("file3.txt", "aa") << '\n';
+	// std::cout << "Expected REJECT: " << turing("file4.txt", "aa") << '\n';
+	// std::cout << "Expected REJECT: " << turing("file5.txt", "aa") << '\n';
+	return 0;
 
 	std::string input;
 	while (true) {
@@ -228,30 +236,37 @@ std::string TuringMachine::clean_input(std::string input) {
 }
 
 std::string TuringMachine::run(std::string input) {
+	// reject if left end marker is not present
+	if (std::string(1, input.at(0)) != kKwLeftMarker) {
+		std::cout << "** Error: No left end marker, instead found <" << input.at(0) << ">\n";
+		return kOutputReject;
+	}
 	std::string state    = initial_;
 	size_t      tape_pos = 0;
 	std::string letter;
 	Transition  transition;
-
+	bool        transition_found = false;
 	while (!exists_in_set(state, reject_) && !exists_in_set(state, accept_)) {
 		// if tape position exceeds the length, add a space to simulate infinite spaces
 		if (tape_pos > input.size() - 1) input += "w";
 		letter = input.at(tape_pos);
-		std::cout << "Processing letter: " << letter << " at position " << tape_pos << '\n';
+		// std::cout << "Processing letter: " << letter << " at position " << tape_pos << '\n';
 		// check if letter is in alphabet
 		if (!exists_in_set(letter, alphabet_) && !exists_in_set(letter, tape_alphabet_)) {
-			std::cout << "** Error: Processing Letter: " << letter << " does not exist in the alphabet\n";
+			std::cout << "** Error: Processing Letter: <" << letter << "> does not exist in the alphabet\n";
 			return kOutputReject;
 		}
 		// ideally done during file parsing but i dont want to deal with all the string arrays
 		// using vectors here would be more appropriate
+		transition_found = false;
 		for (size_t i = 0; i < num_transitions_; ++i) {
 			transition = process_transition(transitions_[i]);
 			// make the transition if possible
 			if (letter == transition.input && state == transition.from) {
+				transition_found = true;
 				// check if to state exists
 				if (!exists_in_set(transition.to, states_)) {
-					std::cout << "** Error: State " << transition.to << " does not exist\n";
+					std::cout << "** Error: State <" << transition.to << "> does not exist\n";
 					return kOutputReject;
 				}
 				// check if trying to move past left end marker
@@ -266,36 +281,40 @@ std::string TuringMachine::run(std::string input) {
 				}
 				// check if trying to write something not part of the full alphabet
 				if (!exists_in_set(transition.output, alphabet_) && !exists_in_set(transition.output, tape_alphabet_)) {
-					std::cout << "** Error: Trying to write " << transition.output << " which is not part of the alphabet\n";
+					std::cout << "** Error: Trying to write <" << transition.output << "> which is not part of the alphabet\n";
 					return kOutputReject;
 				}
 
 				// write to tape
-				std::cout << "Writing " << transition.output << " to tape at position " << tape_pos << '\n';
+				// std::cout << "Writing " << transition.output << " to tape at position " << tape_pos << '\n';
 				input.replace(tape_pos, transition.output.size(), transition.output);
 				// move
 				if (transition.move == kMoveLeft) {
-					std::cout << "Moving left\n";
+					// std::cout << "Moving left\n";
 					tape_pos--;
 				} else if (transition.move == kMoveRight) {
-					std::cout << "Moving right\n";
+					// std::cout << "Moving right\n";
 					tape_pos++;
 				} else {
-					std::cout << "** Error: Move " << transition.move << " is not a valid move\n";
+					std::cout << "** Error: Move <" << transition.move << "> is not a valid move\n";
 					return kOutputReject;
 				}
 				// make the transition
-				std::cout << "Transitioning from " << transition.from << " to " << transition.to << '\n';
+				// std::cout << "Transitioning from " << transition.from << " to " << transition.to << '\n';
 				state = transition.to;
 
 				break;
 			}
 		}
+		if (!transition_found) {
+			std::cout << "** Error: No transition found for state <" << state << "> letter <" << letter << ">\n";
+			return kOutputReject;
+		}
 	}
 
 	// check if state is in accept
 	if (!exists_in_set(state, accept_)) {
-		std::cout << "** Error: State " << transition.to << " is not an accepting state\n";
+		std::cout << "** Error: State <" << transition.to << "> is not an accepting state\n";
 		return kOutputReject;
 	} else {
 		return input;

@@ -1,0 +1,19 @@
+-- alphabet
+A B C D
+-- tape alphabet
+w E a b c d
+-- states
+0 1 2
+-- initial
+0
+-- accept
+1
+-- reject
+2
+-- transitions
+0 -- E,E,R --> 0
+0 -- A,f,R --> 0
+0 -- B,b,R --> 0
+0 -- C,c,R --> 0
+0 -- D,d,R --> 0
+0 -- w,w,R --> 1
