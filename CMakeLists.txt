@@ -37,3 +37,6 @@ add_executable(automaton hw2/automaton.cpp)
 
 # execs for hw3
 add_executable(turing hw3/turing.cpp)
+
+# execs for hw3
+add_executable(hw5ex3 hw5/hw5ex3.cpp)
