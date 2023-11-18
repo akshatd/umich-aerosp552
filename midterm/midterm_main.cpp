@@ -10,12 +10,59 @@ int main(void) {
 	while (true) {
 		// tests
 		std::cout << "-- TESTS -- \n";
-		// ChessBoard board(1);
-		// board.addQueen({0, 0});
-		// board.addQueen({0, 3});
-		// board.addQueen({3, 3});
-		// board.addQueen({3, 0});
-		// board.addQueen({1, 2});
+		// testing chessboard class
+		std::cout << "Trying to add queens to a 0 board ... ";
+		ChessBoard board0(0);
+		board0.addQueen({0, 0});
+		board0.getQueens().size() == 0 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Trying to add more than 1 queen to a 1 board ... ";
+		ChessBoard board1(1);
+		board1.addQueen({0, 0});
+		board1.addQueen({0, 0});
+		board1.getQueens().size() == 1 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Trying to add a queen outside the board ... ";
+		ChessBoard board2(1);
+		board2.addQueen({5, 5});
+		board2.getQueens().size() == 0 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Trying to add a queen in the same row ... ";
+		ChessBoard board3(5);
+		board3.addQueen({2, 2});
+		board3.addQueen({2, 0});
+		board3.getQueens().size() == 1 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Trying to add a queen in the same column ... ";
+		board3.addQueen({0, 2});
+		board3.getQueens().size() == 1 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Trying to add a queen in the same diagonal 1 ... ";
+		board3.addQueen({0, 0});
+		board3.getQueens().size() == 1 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Trying to add a queen in the same diagonal 2 ... ";
+		board3.addQueen({4, 4});
+		board3.getQueens().size() == 1 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+
+		// testing solveNQueens num of solutions generated
+		std::cout << "Testing that n_queens=0 generates 0 solutions  ... ";
+		solveNQueens(0, 0).size() == 0 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=1 generates 1 solution  ... ";
+		solveNQueens(1, 1).size() == 1 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=2 generates 0 solutions  ... ";
+		solveNQueens(2, 2).size() == 0 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=3 generates 0 solutions  ... ";
+		solveNQueens(3, 3).size() == 0 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=4 generates 2 solutions  ... ";
+		solveNQueens(4, 4).size() == 2 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=5 generates 10 solutions  ... ";
+		solveNQueens(5, 5).size() == 10 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=6 generates 4 solutions  ... ";
+		solveNQueens(6, 6).size() == 4 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=7 generates 40 solutions  ... ";
+		solveNQueens(7, 7).size() == 40 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=8 generates 92 solutions  ... ";
+		solveNQueens(8, 8).size() == 92 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=9 generates 352 solutions  ... ";
+		solveNQueens(9, 9).size() == 352 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+		std::cout << "Testing that n_queens=10 generates 724 solutions  ... ";
+		solveNQueens(10, 10).size() == 724 ? std::cout << "Passed\n" : std::cout << "Failed\n";
+
 		std::cin.clear();
 		std::cout << "-- USER INPUT -- \n";
 		std::cout << "Enter the number of Queens (integer > 0): ";
@@ -33,14 +80,13 @@ int main(void) {
 	}
 
 	bool solutions_found = false;
-	// for (uint depth = 1; depth <= static_cast<uint>(input); ++depth) {
-	for (uint depth = input; depth <= static_cast<uint>(input); ++depth) {
+	for (uint depth = 1; depth <= static_cast<uint>(input); ++depth) {
 		std::cout << "Searching depth " << depth << " ... ";
 		std::vector<ChessBoard> solutions = solveNQueens(static_cast<uint>(input), depth);
 		std::cout << "Solutions found: " << solutions.size() << '\n';
 		for (size_t i = 0; i < solutions.size(); ++i) {
 			solutions_found = true;
-			std::cout << "*** Press enter to view solution " << i + 1 << " ***\n";
+			std::cout << "*** Press enter to view solution " << i + 1 << '/' << solutions.size() << " ***\n";
 			std::cin.clear();
 			std::cin.ignore();
 			std::cout << solutions[i] << '\n';
