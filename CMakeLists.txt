@@ -38,5 +38,10 @@ add_executable(automaton hw2/automaton.cpp)
 # execs for hw3
 add_executable(turing hw3/turing.cpp)
 
-# execs for hw3
+# execs for hw5
 add_executable(hw5ex3 hw5/hw5ex3.cpp)
+
+# execs for midterm
+add_library(libchessboard midterm/chessboard.cpp)
+add_executable(midterm midterm/midterm_main.cpp)
+target_link_libraries(midterm PUBLIC libchessboard)
