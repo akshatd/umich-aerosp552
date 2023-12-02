@@ -45,3 +45,7 @@ add_executable(hw5ex3 hw5/hw5ex3.cpp)
 add_library(libchessboard midterm/chessboard.cpp)
 add_executable(midterm midterm/midterm_main.cpp)
 target_link_libraries(midterm PUBLIC libchessboard)
+
+
+# execs for hw6
+add_executable(realtime hw6/realtime.cpp)
