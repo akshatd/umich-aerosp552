@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cmath>
 
 // have to use this weird array size helper because vectors arent allowed :(
 #define ARRAY_LENGTH(array) (sizeof((array)) / sizeof((array)[0]))
@@ -62,42 +63,42 @@ size_t nextTaskEDF(Task tasks[], size_t num_tasks);
 int main(void) {
 	std::cout << "--- Test 0 (class ex 1): fail with RM ---\n";
 	Task test0[] = {
-		Task("t1", 4, 1),
-		Task("t2", 5, 2),
-		Task("t3", 7, 2),
+		Task("T1", 4, 1),
+		Task("T2", 5, 2),
+		Task("T3", 7, 2),
 	};
 	runScheduler(test0, ARRAY_LENGTH(test0), 15, RM);
 	runScheduler(test0, ARRAY_LENGTH(test0), 15, EDF);
 
 	std::cout << "\n--- Test 1 (class ex 2, overscheduled): fail ---\n";
 	Task test1[] = {
-		Task("t1", 4, 3),
-		Task("t2", 5, 3),
-		Task("t3", 6, 3),
-		Task("t3", 7, 3),
+		Task("T1", 4, 3),
+		Task("T2", 5, 3),
+		Task("T3", 6, 3),
+		Task("T3", 7, 3),
 	};
 	runScheduler(test1, ARRAY_LENGTH(test1), 15, RM);
 	runScheduler(test1, ARRAY_LENGTH(test1), 15, EDF);
 
 	std::cout << "\n--- Test 2 (underscheduled): pass with idle ---\n";
 	Task test2[] = {
-		Task("t1", 4, 2),
-		Task("t2", 5, 1),
+		Task("T1", 4, 2),
+		Task("T2", 5, 1),
 	};
 	runScheduler(test2, ARRAY_LENGTH(test2), 10, RM);
 	runScheduler(test2, ARRAY_LENGTH(test2), 10, EDF);
 
 	std::cout << "\n--- Test 3 (one task is very taxing, 100% utilization): pass ---\n";
 	Task test3[] = {
-		Task("t1", 3, 2),
-		Task("t2", 9, 3),
+		Task("T1", 3, 2),
+		Task("T2", 9, 3),
 	};
 	runScheduler(test3, ARRAY_LENGTH(test3), 15, RM);
 	runScheduler(test3, ARRAY_LENGTH(test3), 15, EDF);
 
 	std::cout << "\n--- Test 4 (one task): pass ---\n";
 	Task test4[] = {
-		Task("t1", 5, 5),
+		Task("T1", 5, 5),
 	};
 	runScheduler(test4, ARRAY_LENGTH(test4), 10, RM);
 	runScheduler(test4, ARRAY_LENGTH(test4), 10, EDF);
@@ -111,9 +112,9 @@ void runScheduler(Task tasks[], size_t num_tasks, uint total_time, SchedulerType
 	std::cout << "Scheduling algorithm: " << (type == RM ? "Rate Monotonic" : "Earliest Deadline First") << '\n';
 	std::cout << "Total time          : " << total_time << '\n';
 	std::cout << "Tasks(" << num_tasks << ")            : ";
-	float utilization = 0;
+	double utilization = 0;
 	for (size_t i = 0; i < num_tasks; i++) {
-		utilization += (float)tasks[i].work_length / (float)tasks[i].period;
+		utilization += static_cast<double>(tasks[i].work_length) / static_cast<double>(tasks[i].period);
 		std::cout << tasks[i];
 		if (i != num_tasks - 1) {
 			std::cout << ", ";
@@ -121,9 +122,16 @@ void runScheduler(Task tasks[], size_t num_tasks, uint total_time, SchedulerType
 			std::cout << '\n';
 		}
 	}
-	std::cout << "Utilization         : " << utilization;
-	if (utilization > 1) {
-		std::cout << " *** Warning: The system is not schedulable ***\n";
+	double utilization_limit = 1;
+	double n                 = static_cast<double>(num_tasks);
+	if (type == RM) {
+		utilization_limit = n * (std::pow(2., (1. / n)) - 1);
+	}
+	std::cout << "Utilization         : " << utilization << "/" << utilization_limit;
+
+	if (utilization > utilization_limit) {
+		if (type == RM) std::cout << " *** Warning: The system MAY NOT be schedulable ***\n";
+		if (type == EDF) std::cout << " *** Warning: The system is NOT schedulable ***\n";
 	} else {
 		std::cout << '\n';
 	}
